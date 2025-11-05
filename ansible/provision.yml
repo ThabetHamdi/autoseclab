@@ -1,0 +1,33 @@
+- name: Provision containers and basic tooling
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Ensure artifacts dir exists
+      file:
+        path: "{{ playbook_dir }}/../artifacts"
+        state: directory
+        mode: '0755'
+
+    - name: Ensure podman network exists
+      command: podman network inspect cybernet || podman network create cybernet
+      changed_when: false
+
+    - name: Start dvwa (if not running)
+      command: podman run -d --name dvwa --network cybernet -p 8080:80 vulnerables/web-dvwa:latest
+      register: dvwa_run
+      failed_when: false
+
+    - name: Start kali (if not running)
+      command: podman run -itd --name kali --network cybernet kali-lab
+      register: kali_run
+      failed_when: false
+
+    - name: Wait for DVWA to be up
+      uri:
+        url: http://localhost:8080
+        status_code: 200
+      register: dvwa_up
+      retries: 10
+      delay: 3
+      failed_when: false

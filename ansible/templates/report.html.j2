@@ -1,0 +1,9 @@
+<html>
+<body>
+<h1>AutoSecLab Report</h1>
+<h2>Nmap Results (raw XML)</h2>
+<pre>{{ nmap_xml.content | default('') | b64decode }}</pre>
+<h2>Sqlmap Results</h2>
+<p>See artifact folder: artifacts/sqlmap_out</p>
+</body>
+</html>

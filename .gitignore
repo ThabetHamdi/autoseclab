@@ -1,0 +1,18 @@
+# Podman / artifacts
+artifacts/
+# Terraform state
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+# Ansible cache / logs
+**/__pycache__/
+*.retry
+# OS / editor
+*.swp
+*~
+.vscode/
+.idea/
+.DS_Store
+# creds (if any) - be careful never to commit secrets
+secrets/

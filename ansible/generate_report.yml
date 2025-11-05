@@ -1,0 +1,17 @@
+- name: Generate HTML report from artifacts
+  hosts: local
+  gather_facts: false
+  vars:
+    report_path: "{{ playbook_dir }}/../artifacts/report.html"
+
+  tasks:
+    - name: Read nmap XML if present
+      slurp:
+        src: "{{ playbook_dir }}/../artifacts/nmap_dvwa.xml"
+      register: nmap_xml
+      failed_when: false
+
+    - name: Create simple HTML report
+      template:
+        src: templates/report.html.j2
+        dest: "{{ report_path }}"
