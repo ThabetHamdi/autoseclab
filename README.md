@@ -130,23 +130,10 @@ ansible-playbook -i inventory.ini generate_report.yml
 
 ---
 
-## 🧪 Demonstration Flow (what to show in a demo)
 
-1. `terraform apply` → shows automated provisioning
-2. `podman ps` → show running containers (kali, dvwa)
-3. `ansible-playbook attack_scenario.yml` → run recon & exploit automation
-4. `ansible-playbook generate_report.yml` → open `artifacts/report.html`
-5. Show logs/dashboards (Kibana/Splunk) if SIEM is added
-
-Time estimate for demo: **~5 minutes** (deploy already done or run in advance).
 
 ---
 
-## ✅ Best Practices & Safety
-
-* Run this lab **only** in an isolated VM (bridge/NAT fine) — never on a production or shared network.
-* Document and set `run_exploits: false` in playbooks unless you intend to perform attacks.
-* Use `.gitignore` to avoid committing `artifacts/`, Terraform state, or any secrets.
 
 ---
 
@@ -197,3 +184,4 @@ This project is released under the **MIT License**. See `LICENSE` file.
 Thabet Hamdi — Final Year Student (Information Systems & Network Security)
 
 * GitHub: [https://github.com/ThabetHamdi](https://github.com/ThabetHamdi)
+
