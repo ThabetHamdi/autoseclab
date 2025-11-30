@@ -9,18 +9,37 @@
         state: directory
         mode: '0755'
 
-    - name: Ensure podman network exists
-      command: podman network inspect cybernet || podman network create cybernet
+    - name: Check if podman network exists
+      command: podman network inspect cybernet
+      register: network_check
+      changed_when: false
+      failed_when: false
+
+    - name: Create podman network if not exists
+      command: podman network create cybernet
+      when: network_check.rc != 0
+      changed_when: true
+
+    - name: Check if dvwa container exists
+      command: podman ps -a --format '{{ "{{" }}.Names{{ "}}" }}' --filter name=^dvwa$
+      register: dvwa_check
       changed_when: false
 
     - name: Start dvwa (if not running)
       command: podman run -d --name dvwa --network cybernet -p 8080:80 vulnerables/web-dvwa:latest
       register: dvwa_run
+      when: "'dvwa' not in dvwa_check.stdout"
       failed_when: false
 
+    - name: Check if kali container exists
+      command: podman ps -a --format '{{ "{{" }}.Names{{ "}}" }}' --filter name=^kali$
+      register: kali_check
+      changed_when: false
+
     - name: Start kali (if not running)
-      command: podman run -itd --name kali --network cybernet kali-lab
+      command: podman run -itd --name kali --network cybernet --cap-add=NET_RAW --cap-add=NET_ADMIN kali-lab
       register: kali_run
+      when: "'kali' not in kali_check.stdout"
       failed_when: false
 
     - name: Wait for DVWA to be up

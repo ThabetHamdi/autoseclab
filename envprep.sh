@@ -1,27 +1,65 @@
 #!/bin/bash
-# create_autoseclab_structure.sh
-# This script creates only the directories and empty files for the AutoSecLab project
+# envprep.sh
+# Environment preparation script for AutoSecLab
+# This script installs required dependencies and prepares the environment
 
-# Create directories
-mkdir -p autoseclab/{containers,scripts,ansible/templates,artifacts}
+set -euo pipefail
 
-# Create empty files
-touch autoseclab/README.md
-touch autoseclab/main.tf
+echo "🛡️ AutoSecLab Environment Preparation"
+echo "======================================"
 
-touch autoseclab/containers/kali.Dockerfile
-touch autoseclab/containers/dvwa.Dockerfile
+# Detect OS
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS=$ID
+else
+    echo "❌ Cannot detect OS. Please install dependencies manually."
+    exit 1
+fi
 
-touch autoseclab/scripts/deploy.sh
-touch autoseclab/scripts/create_network.sh
+echo "[+] Detected OS: $OS"
 
-touch autoseclab/ansible/inventory.ini
-touch autoseclab/ansible/provision.yml
-touch autoseclab/ansible/attack_scenario.yml
-touch autoseclab/ansible/generate_report.yml
-touch autoseclab/ansible/templates/report.html.j2
+# Install dependencies based on OS
+case $OS in
+    ubuntu|debian)
+        echo "[+] Installing dependencies for Debian/Ubuntu..."
+        sudo apt-get update
+        sudo apt-get install -y podman git wget unzip python3-pip ansible
+        ;;
+    fedora|rhel|centos)
+        echo "[+] Installing dependencies for RHEL/Fedora/CentOS..."
+        sudo dnf install -y podman git wget unzip python3-pip ansible
+        ;;
+    *)
+        echo "⚠️  Unknown OS: $OS. Please install podman, git, ansible manually."
+        ;;
+esac
 
-# Comment file to indicate purpose of artifacts directory
-echo "# terraform/ansible will write outputs here" > autoseclab/artifacts/README.txt
+# Install Terraform if not present
+if ! command -v terraform &> /dev/null; then
+    echo "[+] Installing Terraform..."
+    TVER=${TERRAFORM_VERSION:-1.9.8}
+    wget -q "https://releases.hashicorp.com/terraform/${TVER}/terraform_${TVER}_linux_amd64.zip" -O /tmp/terraform.zip
+    unzip -o /tmp/terraform.zip -d /tmp/
+    sudo mv /tmp/terraform /usr/local/bin/
+    rm /tmp/terraform.zip
+    echo "[+] Terraform $(terraform -v | head -1) installed"
+else
+    echo "[+] Terraform already installed: $(terraform -v | head -1)"
+fi
 
-echo "✅ AutoSecLab directory structure created successfully!"
+# Make scripts executable
+echo "[+] Setting script permissions..."
+chmod +x scripts/*.sh 2>/dev/null || true
+
+# Create artifacts directory
+mkdir -p artifacts
+
+echo ""
+echo "✅ Environment preparation complete!"
+echo ""
+echo "Next steps:"
+echo "  1. terraform init"
+echo "  2. terraform apply -auto-approve"
+echo "  3. cd ansible && ansible-playbook -i inventory.ini provision.yml"
+echo ""

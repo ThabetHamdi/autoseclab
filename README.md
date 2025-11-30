@@ -79,6 +79,17 @@ autoseclab/
 
 ### Prerequisites
 
+**Option A: Automatic Setup**
+
+Use the environment preparation script to automatically install all dependencies:
+
+```bash
+chmod +x envprep.sh
+./envprep.sh
+```
+
+**Option B: Manual Setup**
+
 Install required packages on your Ubuntu VM:
 
 ```bash
@@ -129,15 +140,6 @@ ansible-playbook -i inventory.ini generate_report.yml
 * If you need Nmap raw socket scans, ensure Kali is started with capabilities (`--cap-add=NET_RAW --cap-add=NET_ADMIN`) — the deploy script can be adjusted accordingly.
 
 ---
-
-
-
----
-
-
----
-
-
 
 ## Roadmap / TODO
 
