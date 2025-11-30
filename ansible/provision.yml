@@ -21,7 +21,7 @@
       changed_when: true
 
     - name: Check if dvwa container exists
-      command: podman ps -a --format '{{ "{{" }}.Names{{ "}}" }}' --filter name=^dvwa$
+      shell: podman ps -a --format "{% raw %}{{.Names}}{% endraw %}" --filter name=^dvwa$
       register: dvwa_check
       changed_when: false
 
@@ -32,7 +32,7 @@
       failed_when: false
 
     - name: Check if kali container exists
-      command: podman ps -a --format '{{ "{{" }}.Names{{ "}}" }}' --filter name=^kali$
+      shell: podman ps -a --format "{% raw %}{{.Names}}{% endraw %}" --filter name=^kali$
       register: kali_check
       changed_when: false
 
