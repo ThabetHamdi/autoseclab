@@ -1,4 +1,4 @@
-- name: Run attack scenario: Recon + SQLi
+- name: "Run attack scenario: Recon + SQLi"
   hosts: local
   gather_facts: false
   vars:
@@ -19,6 +19,12 @@
       register: sqlmap_run
       failed_when: false
 
+    - name: Check if sqlmap output exists
+      command: podman exec kali test -d /tmp/sqlmap_out
+      register: sqlmap_dir_check
+      failed_when: false
+
     - name: Copy sqlmap output to host
-      command: podman cp kali:/tmp/sqlmap_out {{ playbook_dir }}/../artifacts/sqlmap_out || true
+      command: podman cp kali:/tmp/sqlmap_out {{ playbook_dir }}/../artifacts/sqlmap_out
+      when: sqlmap_dir_check.rc == 0
       failed_when: false

@@ -1,6 +1,6 @@
 - name: Generate HTML report from artifacts
   hosts: local
-  gather_facts: false
+  gather_facts: true
   vars:
     report_path: "{{ playbook_dir }}/../artifacts/report.html"
 
@@ -11,7 +11,12 @@
       register: nmap_xml
       failed_when: false
 
-    - name: Create simple HTML report
+    - name: Create HTML report
       template:
         src: templates/report.html.j2
         dest: "{{ report_path }}"
+        mode: '0644'
+
+    - name: Report generation complete
+      debug:
+        msg: "Report generated at {{ report_path }}"
